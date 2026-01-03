@@ -1,0 +1,38 @@
+body {
+    display: flex;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+#sidebar {
+    background-color: cadetblue;
+    color: white;
+    width: 300px;
+    padding: 0px 10px;
+}
+
+#main {
+    padding: 0px 10px;
+    /* top-bottom right-left */
+}
+
+.logo {
+    font-size: 26px;
+    margin: 10px 0px 20px 0px;
+    /* top right bottom left */
+}
+
+form>* {
+    display: block;
+    margin: 10px;
+}
+
+.form-popup {
+    display: none;
+    position: fixed;
+    bottom: auto;
+    right: auto;
+    border: 1px solid cadetblue;
+    z-index: 9;
+}
