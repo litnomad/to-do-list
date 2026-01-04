@@ -1,5 +1,7 @@
 import "./style.css";
 
+// toggle pop up form for adding new projects
+
 const main = document.querySelector('#main');
 const sidebar = document.querySelector('#sidebar');
 const addProject = document.querySelector('.open-button');
@@ -15,6 +17,8 @@ addProject.addEventListener('click', (event) => {
 })
 
 closeButton.addEventListener('click', (event) => hideForm())
+
+// how project will be displayed on page
 
 const createProject = () => {
     const div = document.createElement('div');
@@ -39,13 +43,17 @@ const createProject = () => {
 
 }
 
+// submit button creates new project
+
 submitButton.addEventListener('click', (event) => {
     createProject();
     hideForm();
     event.preventDefault();
 })
 
-const list = [];
+// creates new to do list items 
+
+let list = [];
 
 class createTask {
     constructor(title, description, deadline, priority) {
@@ -55,6 +63,8 @@ class createTask {
         this.priority = priority;
     }
 }
+
+// To Do List form  
 
 const toDoForm = () => {
     const div = document.createElement('div');
@@ -113,11 +123,31 @@ const toDoForm = () => {
     inputPriority.appendChild(lowPriority);
     form.appendChild(submit);
 
+    // submit button adds new items to To Do List
     submit.addEventListener('click', (event) => {
         let task = new createTask(inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value);
         list.push(task);
-        console.log(ToDoList);
+        console.log(list);
+        storeList();
+
         event.preventDefault()
     });
 
 }
+
+// stores list as JSON string in local storage
+function storeList() {
+    const myJSON = JSON.stringify(list);
+    localStorage.setItem('testJSON', myJSON);
+}
+
+// retrieve JSON string of list as object for each page load
+function retrieveList() {
+    let string = localStorage.getItem('testJSON');
+    list = JSON.parse(string);
+}
+
+retrieveList();
+console.log(list)
+console.log(list[1].title);
+
