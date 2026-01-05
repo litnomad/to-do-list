@@ -23,13 +23,14 @@ closeButton.addEventListener('click', (event) => hideForm())
 const createProject = () => {
     const div = document.createElement('div');
     const h3 = document.createElement('h3');
-    const input = document.querySelector('input[id=title]').value;
+    const title = document.querySelector('input[id=title]').value;
     const button = document.createElement('button');
+    const id = window.crypto.randomUUID();
 
-    div.setAttribute('class', 'card');
-    button.setAttribute('class', 'toDoButton');
+    div.id = id;
+    div.classList.add(id); // how do I create a unique class for each project?
 
-    h3.innerText = input;
+    h3.innerText = title;
     button.innerText = 'add to do list';
 
     main.appendChild(div);
@@ -62,6 +63,37 @@ class createTask {
         this.deadline = deadline;
         this.priority = priority;
     }
+}
+
+// To Do List display
+
+function displayList() {
+
+    for (const item of list) {
+
+        const project = document.querySelector(`.${item.title}`); // Mixing up task with project title //
+        const div = document.createElement('div');
+        const title = document.createElement('p');
+        const description = document.createElement('p');
+        const deadline = document.createElement('p');
+        const inputPriority = document.createElement('select');
+        const highPriority = document.createElement('option');
+        const mediumPriority = document.createElement('option');
+        const lowPriority = document.createElement('option');
+
+        inputPriority.setAttribute('class', '.inputPriority');
+        /* document.querySelector('.inputPriority').value = 'list.inputPriority'; */
+
+        title.innerText = item.title;
+        description.innerText = item.description;
+        deadline.innerText = item.deadline;
+
+        project.appendChild(div);
+        div.appendChild(title);
+        div.appendChild(description);
+
+    }
+
 }
 
 // To Do List form  
@@ -128,7 +160,9 @@ const toDoForm = () => {
         let task = new createTask(inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value);
         list.push(task);
         console.log(list);
+
         storeList();
+        displayList();
 
         event.preventDefault()
     });
@@ -147,7 +181,8 @@ function retrieveList() {
     list = JSON.parse(string);
 }
 
-retrieveList();
+/* retrieveList(); 
 console.log(list)
 console.log(list[1].title);
+*/
 
