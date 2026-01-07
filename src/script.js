@@ -1,9 +1,7 @@
 import "./style.css";
 
 // array for created projects
-
 let projects = [];
-console.log(projects);
 
 class Project {
     constructor(project, id) {
@@ -13,7 +11,6 @@ class Project {
 }
 
 // array for created tasks
-
 let list = [];
 
 class Task {
@@ -35,22 +32,24 @@ const popup = document.querySelector('.open-button');
 const closeButton = document.querySelector('.btnCancel');
 const submitButton = document.querySelector('button[type="submit"]');
 
-const displayForm = () => document.querySelector(".form-popup").style.display = "block";
-const hideForm = () => document.querySelector(".form-popup").style.display = "none";
+const displayForm = (selector) => document.querySelector(selector).style.display = "block";
+const hideForm = (selector) => document.querySelector(selector).style.display = "none";
 
 popup.addEventListener('click', (event) => {
-    displayForm();
     event.preventDefault();
+
+    displayForm(".form-popup");
 })
 
-closeButton.addEventListener('click', () => hideForm())
+closeButton.addEventListener('click', () => hideForm(".form-popup"))
 
 // pop up submit button creates new project
 
 submitButton.addEventListener('click', (event) => {
-    createProject();
-    hideForm();
     event.preventDefault();
+
+    createProject();
+    hideForm(".form-popup");
 })
 
 // how project will be displayed on page
@@ -59,8 +58,8 @@ const createProject = () => {
 
     const div = document.createElement('div');
     const h3 = document.createElement('h3');
-    const projectTitle = document.querySelector('input[id=title]').value;
-    const button = document.createElement('button');
+    const projectTitle = document.querySelector('input[id=title]').value; // pass projects.title; call createProject in loadProjects()?
+    const toDoButton = document.createElement('button');
     const id = window.crypto.randomUUID();
 
     div.setAttribute('id', id);
@@ -71,83 +70,81 @@ const createProject = () => {
 
     main.appendChild(div);
     div.appendChild(h3);
-    div.appendChild(button);
+    div.appendChild(toDoButton);
 
-    button.addEventListener('click', (event) => {
+    toDoButton.addEventListener('click', (event) => {
         toDoForm(id, projectTitle);
         event.preventDefault();
     });
 
-    let proj = new Project(projectTitle, id);
+    let proj = new Project(projectTitle, id); // separate this from DOM function?
     projects.push(proj);
-
-    console.log(projects);
-
     storeProject();
-
 }
 
-// Display list array 
+// how tasks will be displayed on page 
 
 function displayList(task) {
 
-    // attach tasks to their projects
+    // attach tasks to projects
+    const project = document.getElementById(`${task.id}`);
+    const taskDiv = document.createElement('div');
+    const taskTitle = document.createElement('p');
+    const taskDescription = document.createElement('p');
+    const taskDeadline = document.createElement('input');
+    const deleteTask = document.createElement('button');
 
-    if (document.getElementById(task.id)) {
+    // create dropdown selection for priority
+    const taskPriority = document.createElement('select');
+    const high = document.createElement('option');
+    const medium = document.createElement('option');
+    const low = document.createElement('option');
 
-        const project = document.getElementById(`${task.id}`);
-        const taskDiv = document.createElement('div');
-        const taskTitle = document.createElement('p');
-        const taskDescription = document.createElement('p');
-        const taskDeadline = document.createElement('input');
-        const deleteTask = document.createElement('button');
+    high.setAttribute('value', 'high');
+    medium.setAttribute('value', 'medium');
+    low.setAttribute('value', 'low');
 
-        // create dropdown selection for priority
-        const taskPriority = document.createElement('select');
-        const high = document.createElement('option');
-        const medium = document.createElement('option');
-        const low = document.createElement('option');
+    high.textContent = 'high';
+    medium.textContent = 'medium';
+    low.textContent = 'low';
 
-        high.setAttribute('value', 'high');
-        medium.setAttribute('value', 'medium');
-        low.setAttribute('value', 'low');
+    taskPriority.appendChild(high);
+    taskPriority.appendChild(medium);
+    taskPriority.appendChild(low);
 
-        high.textContent = 'high';
-        medium.textContent = 'medium';
-        low.textContent = 'low';
+    taskPriority.setAttribute('name', 'priority');
+    taskPriority.value = task.priority;
 
-        taskPriority.appendChild(high);
-        taskPriority.appendChild(medium);
-        taskPriority.appendChild(low);
+    taskDeadline.setAttribute('type', 'date');
+    taskDeadline.setAttribute('value', task.deadline);
 
-        taskPriority.setAttribute('name', 'priority');
-        taskPriority.value = task.priority;
+    taskTitle.textContent = task.title;
+    taskDescription.textContent = task.description;
+    deleteTask.textContent = 'delete';
 
-        taskDeadline.setAttribute('type', 'date');
-        taskDeadline.setAttribute('value', task.deadline);
+    project.appendChild(taskDiv);
+    taskDiv.appendChild(taskTitle);
+    taskDiv.appendChild(taskDescription);
+    taskDiv.appendChild(taskDeadline);
+    taskDiv.appendChild(taskPriority);
+    taskDiv.appendChild(deleteTask);
 
-        taskTitle.textContent = task.title;
-        taskDescription.textContent = task.description;
-        deleteTask.textContent = 'delete';
-
-        project.appendChild(taskDiv);
-        taskDiv.appendChild(taskTitle);
-        taskDiv.appendChild(taskDescription);
-        taskDiv.appendChild(taskDeadline);
-        taskDiv.appendChild(taskPriority);
-        taskDiv.appendChild(deleteTask);
-
-        deleteTask.addEventListener('click', () => {
-            project.removeChild(taskDiv);
-
-        });
-    }
+    deleteTask.addEventListener('click', () => {
+        project.removeChild(taskDiv);
+    });
 
 }
 
-// To Do List form  
+// To Do form  
 
 const toDoForm = (id, projectTitle) => {
+
+    if (document.querySelector('.toDoFormContainer')) {
+        document.querySelector('.toDoFormContainer').remove();
+        return false;
+    }
+
+    const project = document.getElementById(`${id}`);
     const div = document.createElement('div');
     const form = document.createElement('form');
     const title = document.createElement('label');
@@ -163,7 +160,7 @@ const toDoForm = (id, projectTitle) => {
     const lowPriority = document.createElement('option');
     const submit = document.createElement('button');
 
-    div.setAttribute('class', 'toDoContainer');
+    div.setAttribute('class', 'toDoFormContainer');
     form.setAttribute('class', 'toDoForm');
 
     inputDeadline.setAttribute('type', 'date');
@@ -190,7 +187,10 @@ const toDoForm = (id, projectTitle) => {
     medPriority.setAttribute('value', 'medium');
     lowPriority.setAttribute('value', 'low');
 
-    main.appendChild(form);
+    // attach to do form below project container
+
+    project.appendChild(div);
+    div.appendChild(form);
     form.appendChild(title);
     form.appendChild(inputTitle);
     form.appendChild(description);
@@ -205,24 +205,24 @@ const toDoForm = (id, projectTitle) => {
     form.appendChild(submit);
 
     // submit button adds new items to To Do List
-    submit.addEventListener('click', (event) => {
 
+    submit.addEventListener('click', (event) => {
+        event.preventDefault();
+
+        // takes new task and stores it in the list
         let task = new Task(inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, projectTitle, id);
         list.push(task);
         console.log(list);
-
         storeList();
 
         displayList(task, id);
 
-        event.preventDefault();
+        hideForm('.toDoFormContainer');
     });
 
 }
 
-// hide to do form after submission
-
-// local storage and restoration of projects and to do lists 
+// local storage of projects and to do lists 
 
 // stores project as JSON string in local storage
 function storeProject() {
@@ -230,6 +230,7 @@ function storeProject() {
     localStorage.setItem('proj', myJSON1);
 }
 
+// retrieve JSON string of projects as object for each page load
 function retrieveProject() {
     let proj = localStorage.getItem('proj');
     projects = proj ? JSON.parse(proj) : [];
@@ -248,8 +249,6 @@ function retrieveList() {
 }
 
 retrieveProject();
-console.log(projects);
-
 retrieveList();
 
 function loadProjects() {
@@ -259,13 +258,6 @@ function loadProjects() {
         const div = document.createElement('div');
         const h3 = document.createElement('h3');
         const toDoButton = document.createElement('button');
-
-        // create to do list
-        const taskDiv = document.createElement('div');
-        const taskTitle = document.createElement('p');
-        const taskDescription = document.createElement('p');
-        const taskDeadline = document.createElement('input');
-        const deleteTask = document.createElement('button');
 
         const id = proj.id;
         div.setAttribute('id', id);
@@ -286,6 +278,7 @@ function loadProjects() {
     }
 }
 
+// can this be consolidated by calling DOM functions?
 function loadList() {
 
     if (!list) {
