@@ -1,22 +1,49 @@
 import "./style.css";
 
+// array for created projects
+
+let projects = [];
+console.log(projects);
+
+class Project {
+    constructor(project, id) {
+        this.project = project;
+        this.id = id;
+    }
+}
+
+// array for created tasks
+
+let list = [];
+
+class Task {
+    constructor(title, description, deadline, priority, projectTitle, id) {
+        this.title = title;
+        this.description = description;
+        this.deadline = deadline;
+        this.priority = priority;
+        this.project = projectTitle;
+        this.id = id;
+    }
+}
+
 // toggle pop up form for adding new projects
 
 const main = document.querySelector('#main');
 const sidebar = document.querySelector('#sidebar');
-const addProject = document.querySelector('.open-button');
+const popup = document.querySelector('.open-button');
 const closeButton = document.querySelector('.btnCancel');
 const submitButton = document.querySelector('button[type="submit"]');
 
 const displayForm = () => document.querySelector(".form-popup").style.display = "block";
 const hideForm = () => document.querySelector(".form-popup").style.display = "none";
 
-addProject.addEventListener('click', (event) => {
+popup.addEventListener('click', (event) => {
     displayForm();
     event.preventDefault();
 })
 
-closeButton.addEventListener('click', (event) => hideForm())
+closeButton.addEventListener('click', () => hideForm())
 
 // pop up submit button creates new project
 
@@ -29,6 +56,7 @@ submitButton.addEventListener('click', (event) => {
 // how project will be displayed on page
 
 const createProject = () => {
+
     const div = document.createElement('div');
     const h3 = document.createElement('h3');
     const projectTitle = document.querySelector('input[id=title]').value;
@@ -36,12 +64,10 @@ const createProject = () => {
     const id = window.crypto.randomUUID();
 
     div.setAttribute('id', id);
-
-    console.log(div.getAttribute('id'));
+    button.setAttribute('type', 'submit');
 
     h3.innerText = projectTitle;
     button.innerText = 'add to do list';
-    button.setAttribute('type', 'submit');
 
     main.appendChild(div);
     div.appendChild(h3);
@@ -51,40 +77,33 @@ const createProject = () => {
         toDoForm(id, projectTitle);
         event.preventDefault();
     });
-}
 
-// creates new to do list items 
+    let proj = new Project(projectTitle, id);
+    projects.push(proj);
 
-let list = [];
+    console.log(projects);
 
-class createTask {
-    constructor(title, description, deadline, priority, projectTitle, id) {
-        this.title = title;
-        this.description = description;
-        this.deadline = deadline;
-        this.priority = priority;
-        this.project = projectTitle;
-        this.id = id;
-    }
+    storeProject();
+
 }
 
 // Display list array 
 
 function displayList(task) {
 
-    // attach tasks to their project cards
+    // attach tasks to their projects
 
     if (document.getElementById(task.id)) {
 
         const project = document.getElementById(`${task.id}`);
-        const div = document.createElement('div');
-        const title = document.createElement('p');
-        const description = document.createElement('p');
-        const inputDeadline = document.createElement('input');
-        const deleteButton = document.createElement('button');
+        const taskDiv = document.createElement('div');
+        const taskTitle = document.createElement('p');
+        const taskDescription = document.createElement('p');
+        const taskDeadline = document.createElement('input');
+        const deleteTask = document.createElement('button');
 
         // create dropdown selection for priority
-        const inputPriority = document.createElement('select');
+        const taskPriority = document.createElement('select');
         const high = document.createElement('option');
         const medium = document.createElement('option');
         const low = document.createElement('option');
@@ -97,89 +116,34 @@ function displayList(task) {
         medium.textContent = 'medium';
         low.textContent = 'low';
 
-        inputPriority.appendChild(high);
-        inputPriority.appendChild(medium);
-        inputPriority.appendChild(low);
+        taskPriority.appendChild(high);
+        taskPriority.appendChild(medium);
+        taskPriority.appendChild(low);
 
-        inputPriority.setAttribute('name', 'priority');
-        inputPriority.value = task.priority;
+        taskPriority.setAttribute('name', 'priority');
+        taskPriority.value = task.priority;
 
-        inputDeadline.setAttribute('type', 'date');
-        inputDeadline.setAttribute('value', task.deadline);
+        taskDeadline.setAttribute('type', 'date');
+        taskDeadline.setAttribute('value', task.deadline);
 
-        title.textContent = task.title;
-        description.textContent = task.description;
-        deleteButton.textContent = 'delete';
+        taskTitle.textContent = task.title;
+        taskDescription.textContent = task.description;
+        deleteTask.textContent = 'delete';
 
-        project.appendChild(div);
-        div.appendChild(title);
-        div.appendChild(description);
-        div.appendChild(inputDeadline);
-        div.appendChild(inputPriority);
-        div.appendChild(deleteButton);
+        project.appendChild(taskDiv);
+        taskDiv.appendChild(taskTitle);
+        taskDiv.appendChild(taskDescription);
+        taskDiv.appendChild(taskDeadline);
+        taskDiv.appendChild(taskPriority);
+        taskDiv.appendChild(deleteTask);
 
-        deleteButton.addEventListener('click', (event) => {
-            project.removeChild(div);
+        deleteTask.addEventListener('click', () => {
+            project.removeChild(taskDiv);
 
         });
     }
 
 }
-
-
-/* To Do List display
-
-function displayList(task, id) {
-
-    const project = document.getElementById(`${id}`);
-    const div = document.createElement('div');
-    const title = document.createElement('p');
-    const description = document.createElement('p');
-    const inputDeadline = document.createElement('input');
-    const deleteButton = document.createElement('button');
-
-    // create dropdown selection for priority
-    const inputPriority = document.createElement('select');
-    const high = document.createElement('option');
-    const medium = document.createElement('option');
-    const low = document.createElement('option');
-
-    high.setAttribute('value', 'high');
-    medium.setAttribute('value', 'medium');
-    low.setAttribute('value', 'low');
-
-    high.textContent = 'high';
-    medium.textContent = 'medium';
-    low.textContent = 'low';
-
-    inputPriority.appendChild(high);
-    inputPriority.appendChild(medium);
-    inputPriority.appendChild(low);
-
-    inputPriority.setAttribute('name', 'priority');
-    inputPriority.value = task.priority;
-
-    inputDeadline.setAttribute('type', 'date');
-    inputDeadline.setAttribute('value', task.deadline);
-
-    title.textContent = task.title;
-    description.textContent = task.description;
-    deleteButton.textContent = 'delete';
-
-    project.appendChild(div);
-    div.appendChild(title);
-    div.appendChild(description);
-    div.appendChild(inputDeadline);
-    div.appendChild(inputPriority);
-    div.appendChild(deleteButton);
-
-    deleteButton.addEventListener('click', (event) => {
-        project.removeChild(div);
-
-    });
-
-}
-*/
 
 // To Do List form  
 
@@ -242,11 +206,13 @@ const toDoForm = (id, projectTitle) => {
 
     // submit button adds new items to To Do List
     submit.addEventListener('click', (event) => {
-        let task = new createTask(inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, projectTitle, id);
+
+        let task = new Task(inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, projectTitle, id);
         list.push(task);
         console.log(list);
 
         storeList();
+
         displayList(task, id);
 
         event.preventDefault();
@@ -256,8 +222,18 @@ const toDoForm = (id, projectTitle) => {
 
 // hide to do form after submission
 
+// local storage and restoration of projects and to do lists 
 
-// local storage and retrieval of lists 
+// stores project as JSON string in local storage
+function storeProject() {
+    const myJSON1 = JSON.stringify(projects);
+    localStorage.setItem('proj', myJSON1);
+}
+
+function retrieveProject() {
+    let proj = localStorage.getItem('proj');
+    projects = proj ? JSON.parse(proj) : [];
+}
 
 // stores list as JSON string in local storage
 function storeList() {
@@ -268,14 +244,49 @@ function storeList() {
 // retrieve JSON string of list as object for each page load
 function retrieveList() {
     let string = localStorage.getItem('testJSON');
-    list = JSON.parse(string);
+    list = string ? JSON.parse(string) : [];
 }
 
+retrieveProject();
+console.log(projects);
+
 retrieveList();
-console.log(list);
 
+function loadProjects() {
+    for (const proj of projects) {
 
-function loadStorage() {
+        // create projects
+        const div = document.createElement('div');
+        const h3 = document.createElement('h3');
+        const toDoButton = document.createElement('button');
+
+        // create to do list
+        const taskDiv = document.createElement('div');
+        const taskTitle = document.createElement('p');
+        const taskDescription = document.createElement('p');
+        const taskDeadline = document.createElement('input');
+        const deleteTask = document.createElement('button');
+
+        const id = proj.id;
+        div.setAttribute('id', id);
+        toDoButton.setAttribute('type', 'submit');
+
+        const projectTitle = proj.project;
+        h3.textContent = projectTitle;
+        toDoButton.textContent = 'add to do list';
+
+        main.appendChild(div);
+        div.appendChild(h3);
+        div.appendChild(toDoButton);
+
+        toDoButton.addEventListener('click', (event) => {
+            toDoForm(id, projectTitle);
+            event.preventDefault();
+        });
+    }
+}
+
+function loadList() {
 
     if (!list) {
         return false;
@@ -287,27 +298,17 @@ function loadStorage() {
             // create projects
             const div = document.createElement('div');
             const h3 = document.createElement('h3');
-            const projectTitle = item.project;
-            const button = document.createElement('button');
-            const id = item.id;
-
-            console.log(id);
-            div.setAttribute('id', id);
-            console.log(div.getAttribute('id'))
-
-            h3.innerText = projectTitle;
-            button.innerText = 'add to do list';
-            button.setAttribute('type', 'submit');
+            const toDoButton = document.createElement('button');
 
             // create to do list
-            const div2 = document.createElement('div');
-            const title = document.createElement('p');
-            const description = document.createElement('p');
-            const inputDeadline = document.createElement('input');
-            const deleteButton = document.createElement('button');
+            const taskDiv = document.createElement('div');
+            const taskTitle = document.createElement('p');
+            const taskDescription = document.createElement('p');
+            const taskDeadline = document.createElement('input');
+            const deleteTask = document.createElement('button');
 
             // create dropdown selection for priority
-            const inputPriority = document.createElement('select');
+            const taskPriority = document.createElement('select');
             const high = document.createElement('option');
             const medium = document.createElement('option');
             const low = document.createElement('option');
@@ -320,55 +321,64 @@ function loadStorage() {
             medium.textContent = 'medium';
             low.textContent = 'low';
 
-            inputPriority.appendChild(high);
-            inputPriority.appendChild(medium);
-            inputPriority.appendChild(low);
+            taskPriority.appendChild(high);
+            taskPriority.appendChild(medium);
+            taskPriority.appendChild(low);
 
-            inputPriority.setAttribute('name', 'priority');
-            inputPriority.value = item.priority;
+            taskPriority.setAttribute('name', 'priority');
+            taskPriority.value = item.priority;
 
-            inputDeadline.setAttribute('type', 'date');
-            inputDeadline.setAttribute('name', 'deadline');
-            inputDeadline.setAttribute('value', item.deadline);
+            taskDeadline.setAttribute('type', 'date');
+            taskDeadline.setAttribute('name', 'deadline');
+            taskDeadline.setAttribute('value', item.deadline);
 
-            title.textContent = item.title;
-            description.textContent = item.description;
-            deleteButton.textContent = 'delete'
+            taskTitle.textContent = item.title;
+            taskDescription.textContent = item.description;
+            deleteTask.textContent = 'delete'
+
+            const id = item.id;
+            div.setAttribute('id', id);
+            toDoButton.setAttribute('type', 'submit');
+
+            const projectTitle = item.project;
+            h3.textContent = projectTitle;
+            toDoButton.textContent = 'add to do list';
 
             main.appendChild(div);
             div.appendChild(h3);
-            div.appendChild(button);
-            div.appendChild(div2);
-            div2.appendChild(title);
-            div2.appendChild(description);
-            div2.appendChild(inputDeadline);
-            div2.appendChild(inputPriority);
-            div2.appendChild(deleteButton);
+            div.appendChild(toDoButton);
+            div.appendChild(taskDiv);
+            taskDiv.appendChild(taskTitle);
+            taskDiv.appendChild(taskDescription);
+            taskDiv.appendChild(taskDeadline);
+            taskDiv.appendChild(taskPriority);
+            taskDiv.appendChild(deleteTask);
 
-            button.addEventListener('click', (event) => {
+            toDoButton.addEventListener('click', (event) => {
                 toDoForm(id, projectTitle);
                 event.preventDefault();
             });
 
-            deleteButton.addEventListener('click', () => {
-                div.removeChild(div2);
+            deleteTask.addEventListener('click', () => {
+                div.removeChild(taskDiv);
                 list = list.filter((obj) => obj != item);
                 console.log(list);
                 storeList();
             });
         }
+
         else {
             if (document.getElementById(item.id)) {
 
                 const project = document.getElementById(`${item.id}`);
-                const div = document.createElement('div');
-                const title = document.createElement('p');
-                const description = document.createElement('p');
-                const inputDeadline = document.createElement('input');
-                const deleteButton = document.createElement('button');
+                const taskDiv = document.createElement('div');
+                const taskTitle = document.createElement('p');
+                const taskDescription = document.createElement('p');
+                const taskDeadline = document.createElement('input');
+                const deleteTask = document.createElement('button');
 
                 // create dropdown selection for priority
-                const inputPriority = document.createElement('select');
+                const taskPriority = document.createElement('select');
                 const high = document.createElement('option');
                 const medium = document.createElement('option');
                 const low = document.createElement('option');
@@ -381,35 +391,29 @@ function loadStorage() {
                 medium.textContent = 'medium';
                 low.textContent = 'low';
 
-                inputPriority.appendChild(high);
-                inputPriority.appendChild(medium);
-                inputPriority.appendChild(low);
+                taskPriority.appendChild(high);
+                taskPriority.appendChild(medium);
+                taskPriority.appendChild(low);
 
-                inputPriority.setAttribute('name', 'priority');
-                inputPriority.value = item.priority;
+                taskPriority.setAttribute('name', 'priority');
+                taskPriority.value = item.priority;
 
-                inputDeadline.setAttribute('type', 'date');
-                inputDeadline.setAttribute('value', item.deadline);
+                taskDeadline.setAttribute('type', 'date');
+                taskDeadline.setAttribute('value', item.deadline);
 
-                // set the task div items to equal item.id or random number?
-                // delete button 
-                // set onclick attribute for delete button to call deleteTask()
-                // deleteTask()
-                // if div.id == this.id (button) then getElementbyID(this.id).remove()
+                taskTitle.textContent = item.title;
+                taskDescription.textContent = item.description;
+                deleteTask.textContent = 'delete';
 
-                title.textContent = item.title;
-                description.textContent = item.description;
-                deleteButton.textContent = 'delete';
+                project.appendChild(taskDiv);
+                taskDiv.appendChild(taskTitle);
+                taskDiv.appendChild(taskDescription);
+                taskDiv.appendChild(taskDeadline);
+                taskDiv.appendChild(taskPriority);
+                taskDiv.appendChild(deleteTask);
 
-                project.appendChild(div);
-                div.appendChild(title);
-                div.appendChild(description);
-                div.appendChild(inputDeadline);
-                div.appendChild(inputPriority);
-                div.appendChild(deleteButton);
-
-                deleteButton.addEventListener('click', () => {
-                    project.removeChild(div);
+                deleteTask.addEventListener('click', () => {
+                    project.removeChild(taskDiv);
                     list = list.filter((obj) => obj != item);
                     console.log(list);
                     storeList();
@@ -419,6 +423,7 @@ function loadStorage() {
     }
 }
 
-loadStorage();
+loadProjects();
+loadList();
 
 
