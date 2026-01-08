@@ -243,9 +243,9 @@ function displayList(task) {
 
         deleteTask.addEventListener('click', () => {
             project.removeChild(taskDiv);
-            list = list.filter((obj) => obj !== task);
+            list = list.filter((obj) => obj != task);
             console.log(list);
-            storeProject();
+            storeList();
         })
 
     }
@@ -376,9 +376,9 @@ function loadList() {
 
             deleteTask.addEventListener('click', () => {
                 project.removeChild(taskDiv);
-                list = list.filter((obj) => obj !== item);
+                list = list.filter((obj) => obj != item);
                 console.log(list);
-                storeProject();
+                storeList();
             })
         }
     }
