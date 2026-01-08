@@ -52,6 +52,15 @@ submitButton.addEventListener('click', (event) => {
     hideForm(".form-popup");
 })
 
+// function for creating and pushing projects into an array
+
+function projectArray(name, ref) {
+    let proj = new Project(name, ref);
+    projects.push(proj);
+    storeProject();
+    return { proj };
+}
+
 // how project will be displayed on page
 
 const createProject = () => {
@@ -61,26 +70,47 @@ const createProject = () => {
     const projectTitle = document.querySelector('input[id=title]').value; // pass projects.title; call createProject in loadProjects()?
     const toDoButton = document.createElement('button');
     const id = window.crypto.randomUUID();
+    const deleteProject = document.createElement('button');
+
+    // return true when pop up submit button is clicked
+    // if pop up submit is true, then projectTitle = input[id=title] and id = random
+    // call projectArray() to push new project into projects array
+    // else projectTitle = projects.title and id = projects.id, and toDoForm(projects.id, ..)
+    // do not call projectArray in loadProjects()...
+    // filter array...
+    // should I use factory function to return hidden variables 
+    // return div, h3, if..then.., append,  
 
     div.setAttribute('id', id);
-    button.setAttribute('type', 'submit');
+    toDoButton.setAttribute('type', 'submit');
 
-    h3.innerText = projectTitle;
-    button.innerText = 'add to do list';
+    h3.textContent = projectTitle;
+    toDoButton.textContent = 'add to do list';
+    deleteProject.textContent = 'delete project';
 
     main.appendChild(div);
     div.appendChild(h3);
     div.appendChild(toDoButton);
+    div.appendChild(deleteProject);
 
     toDoButton.addEventListener('click', (event) => {
-        toDoForm(id, projectTitle);
         event.preventDefault();
+        toDoForm(id, projectTitle);
     });
 
-    let proj = new Project(projectTitle, id); // separate this from DOM function?
-    projects.push(proj);
-    storeProject();
+    projectArray(projectTitle, id);
+
+    deleteProject.addEventListener('click', () => {
+        main.removeChild(div);
+
+        const index = projects.indexOf(projectArray(projectTitle, id).proj);
+        projects.splice(index, 1);
+        storeProject();
+
+    })
 }
+
+// Separate DOM function from displayList() and reuse DOM() in loadList() function. 
 
 // how tasks will be displayed on page 
 
@@ -258,6 +288,7 @@ function loadProjects() {
         const div = document.createElement('div');
         const h3 = document.createElement('h3');
         const toDoButton = document.createElement('button');
+        const deleteProject = document.createElement('button');
 
         const id = proj.id;
         div.setAttribute('id', id);
@@ -266,17 +297,29 @@ function loadProjects() {
         const projectTitle = proj.project;
         h3.textContent = projectTitle;
         toDoButton.textContent = 'add to do list';
+        deleteProject.textContent = 'delete project';
 
         main.appendChild(div);
         div.appendChild(h3);
         div.appendChild(toDoButton);
+        div.appendChild(deleteProject);
 
         toDoButton.addEventListener('click', (event) => {
             toDoForm(id, projectTitle);
             event.preventDefault();
         });
+
+        deleteProject.addEventListener('click', () => {
+            main.removeChild(div);
+            projects = projects.filter((obj) => obj != proj);
+            console.log(projects);
+            storeProject();
+        })
+
     }
 }
+
+
 
 // can this be consolidated by calling DOM functions?
 function loadList() {
