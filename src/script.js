@@ -227,8 +227,6 @@ function displayList(task) {
         taskDeadline.setAttribute('type', 'date');
         taskDeadline.setAttribute('value', task.deadline);
         deleteTask.setAttribute('class', 'delete-task');
-        taskDiv.setAttribute('class', 'task-div');
-        taskDiv.setAttribute('id', task.id);
 
         taskTitle.textContent = task.title;
         taskDescription.textContent = task.description;
@@ -245,7 +243,7 @@ function displayList(task) {
 
         deleteTask.addEventListener('click', () => {
             project.removeChild(taskDiv);
-            list = list.filter((obj) => obj.id !== task.id);
+            list = list.filter((obj) => obj !== task);
             console.log(list);
             storeProject();
         })
@@ -362,8 +360,6 @@ function loadList() {
             taskDeadline.setAttribute('type', 'date');
             taskDeadline.setAttribute('value', item.deadline);
             deleteTask.setAttribute('class', 'delete-task');
-            taskDiv.setAttribute('class', 'task-div');
-            taskDiv.setAttribute('id', item.id)
 
             taskTitle.textContent = item.title;
             taskDescription.textContent = item.description;
@@ -380,7 +376,7 @@ function loadList() {
 
             deleteTask.addEventListener('click', () => {
                 project.removeChild(taskDiv);
-                list = list.filter((obj) => obj.id !== item.id);
+                list = list.filter((obj) => obj !== item);
                 console.log(list);
                 storeProject();
             })
