@@ -110,61 +110,6 @@ const createProject = () => {
     })
 }
 
-// Separate DOM function from displayList() and reuse DOM() in loadList() function. 
-
-// how tasks will be displayed on page 
-
-function displayList(task) {
-
-    // attach tasks to projects
-    const project = document.getElementById(`${task.id}`);
-    const taskDiv = document.createElement('div');
-    const taskTitle = document.createElement('p');
-    const taskDescription = document.createElement('p');
-    const taskDeadline = document.createElement('input');
-    const deleteTask = document.createElement('button');
-
-    // create dropdown selection for priority
-    const taskPriority = document.createElement('select');
-    const high = document.createElement('option');
-    const medium = document.createElement('option');
-    const low = document.createElement('option');
-
-    high.setAttribute('value', 'high');
-    medium.setAttribute('value', 'medium');
-    low.setAttribute('value', 'low');
-
-    high.textContent = 'high';
-    medium.textContent = 'medium';
-    low.textContent = 'low';
-
-    taskPriority.appendChild(high);
-    taskPriority.appendChild(medium);
-    taskPriority.appendChild(low);
-
-    taskPriority.setAttribute('name', 'priority');
-    taskPriority.value = task.priority;
-
-    taskDeadline.setAttribute('type', 'date');
-    taskDeadline.setAttribute('value', task.deadline);
-
-    taskTitle.textContent = task.title;
-    taskDescription.textContent = task.description;
-    deleteTask.textContent = 'delete';
-
-    project.appendChild(taskDiv);
-    taskDiv.appendChild(taskTitle);
-    taskDiv.appendChild(taskDescription);
-    taskDiv.appendChild(taskDeadline);
-    taskDiv.appendChild(taskPriority);
-    taskDiv.appendChild(deleteTask);
-
-    deleteTask.addEventListener('click', () => {
-        project.removeChild(taskDiv);
-    });
-
-}
-
 // To Do form  
 
 const toDoForm = (id, projectTitle) => {
@@ -242,6 +187,7 @@ const toDoForm = (id, projectTitle) => {
         // takes new task and stores it in the list
         let task = new Task(inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, projectTitle, id);
         list.push(task);
+
         console.log(list);
         storeList();
 
@@ -249,6 +195,62 @@ const toDoForm = (id, projectTitle) => {
 
         hideForm('.toDoFormContainer');
     });
+
+}
+
+// how tasks will be displayed on page 
+
+function displayList(task) {
+
+    if (document.getElementById(`${task.id}`)) {
+
+        const project = document.getElementById(`${task.id}`);
+
+        // create task elements
+        const taskDiv = document.createElement('div');
+        const taskTitle = document.createElement('p');
+        const taskDescription = document.createElement('p');
+        const taskDeadline = document.createElement('input');
+        const deleteTask = document.createElement('button');
+
+        // priority dropdown
+        const taskPriority = document.createElement('select');
+        ['high', 'medium', 'low'].forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v; opt.textContent = v;
+            taskPriority.appendChild(opt);
+        });
+
+        taskPriority.setAttribute('name', 'priority');
+        taskPriority.value = task.priority;
+
+        taskDeadline.setAttribute('type', 'date');
+        taskDeadline.setAttribute('value', task.deadline);
+        deleteTask.setAttribute('class', 'delete-task');
+        taskDiv.setAttribute('class', 'task-div');
+        taskDiv.setAttribute('id', task.id);
+
+        taskTitle.textContent = task.title;
+        taskDescription.textContent = task.description;
+        deleteTask.textContent = 'delete';
+
+        // taskDiv keeps getting replaced with each iteration?
+        project.appendChild(taskDiv);
+        console.log('appending taskDiv for', task.title, taskDiv)
+        taskDiv.appendChild(taskTitle);
+        taskDiv.appendChild(taskDescription);
+        taskDiv.appendChild(taskDeadline);
+        taskDiv.appendChild(taskPriority);
+        taskDiv.appendChild(deleteTask);
+
+        deleteTask.addEventListener('click', () => {
+            project.removeChild(taskDiv);
+            list = list.filter((obj) => obj.id !== task.id);
+            console.log(list);
+            storeProject();
+        })
+
+    }
 
 }
 
@@ -279,7 +281,9 @@ function retrieveList() {
 }
 
 retrieveProject();
+console.log(projects);
 retrieveList();
+console.log(list);
 
 function loadProjects() {
     for (const proj of projects) {
@@ -311,17 +315,20 @@ function loadProjects() {
 
         deleteProject.addEventListener('click', () => {
             main.removeChild(div);
-            projects = projects.filter((obj) => obj != proj);
+
+            // delete project and list
+            projects = projects.filter(obj => obj !== proj);
             console.log(projects);
             storeProject();
+
+            list = list.filter(obj => obj.id !== proj.id);
+            storeList();
+
         })
 
     }
 }
 
-
-
-// can this be consolidated by calling DOM functions?
 function loadList() {
 
     if (!list) {
@@ -329,132 +336,54 @@ function loadList() {
     }
 
     for (const item of list) {
-        if (!document.getElementById(item.id)) {
 
-            // create projects
-            const div = document.createElement('div');
-            const h3 = document.createElement('h3');
-            const toDoButton = document.createElement('button');
+        if (document.getElementById(`${item.id}`)) {
 
-            // create to do list
+            const project = document.getElementById(`${item.id}`);
+
+            // create task elements
             const taskDiv = document.createElement('div');
             const taskTitle = document.createElement('p');
             const taskDescription = document.createElement('p');
             const taskDeadline = document.createElement('input');
             const deleteTask = document.createElement('button');
 
-            // create dropdown selection for priority
+            // priority dropdown
             const taskPriority = document.createElement('select');
-            const high = document.createElement('option');
-            const medium = document.createElement('option');
-            const low = document.createElement('option');
-
-            high.setAttribute('value', 'high');
-            medium.setAttribute('value', 'medium');
-            low.setAttribute('value', 'low');
-
-            high.textContent = 'high';
-            medium.textContent = 'medium';
-            low.textContent = 'low';
-
-            taskPriority.appendChild(high);
-            taskPriority.appendChild(medium);
-            taskPriority.appendChild(low);
+            ['high', 'medium', 'low'].forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v; opt.textContent = v;
+                taskPriority.appendChild(opt);
+            });
 
             taskPriority.setAttribute('name', 'priority');
             taskPriority.value = item.priority;
 
             taskDeadline.setAttribute('type', 'date');
-            taskDeadline.setAttribute('name', 'deadline');
             taskDeadline.setAttribute('value', item.deadline);
+            deleteTask.setAttribute('class', 'delete-task');
+            taskDiv.setAttribute('class', 'task-div');
+            taskDiv.setAttribute('id', item.id)
 
             taskTitle.textContent = item.title;
             taskDescription.textContent = item.description;
-            deleteTask.textContent = 'delete'
+            deleteTask.textContent = 'delete';
 
-            const id = item.id;
-            div.setAttribute('id', id);
-            toDoButton.setAttribute('type', 'submit');
-
-            const projectTitle = item.project;
-            h3.textContent = projectTitle;
-            toDoButton.textContent = 'add to do list';
-
-            main.appendChild(div);
-            div.appendChild(h3);
-            div.appendChild(toDoButton);
-            div.appendChild(taskDiv);
+            // taskDiv keeps getting replaced with each iteration?
+            project.appendChild(taskDiv);
+            console.log('appending taskDiv for', item.title, taskDiv)
             taskDiv.appendChild(taskTitle);
             taskDiv.appendChild(taskDescription);
             taskDiv.appendChild(taskDeadline);
             taskDiv.appendChild(taskPriority);
             taskDiv.appendChild(deleteTask);
 
-            toDoButton.addEventListener('click', (event) => {
-                toDoForm(id, projectTitle);
-                event.preventDefault();
-            });
-
             deleteTask.addEventListener('click', () => {
-                div.removeChild(taskDiv);
-                list = list.filter((obj) => obj != item);
+                project.removeChild(taskDiv);
+                list = list.filter((obj) => obj.id !== item.id);
                 console.log(list);
-                storeList();
-            });
-        }
-
-        else {
-            if (document.getElementById(item.id)) {
-
-                const project = document.getElementById(`${item.id}`);
-                const taskDiv = document.createElement('div');
-                const taskTitle = document.createElement('p');
-                const taskDescription = document.createElement('p');
-                const taskDeadline = document.createElement('input');
-                const deleteTask = document.createElement('button');
-
-                // create dropdown selection for priority
-                const taskPriority = document.createElement('select');
-                const high = document.createElement('option');
-                const medium = document.createElement('option');
-                const low = document.createElement('option');
-
-                high.setAttribute('value', 'high');
-                medium.setAttribute('value', 'medium');
-                low.setAttribute('value', 'low');
-
-                high.textContent = 'high';
-                medium.textContent = 'medium';
-                low.textContent = 'low';
-
-                taskPriority.appendChild(high);
-                taskPriority.appendChild(medium);
-                taskPriority.appendChild(low);
-
-                taskPriority.setAttribute('name', 'priority');
-                taskPriority.value = item.priority;
-
-                taskDeadline.setAttribute('type', 'date');
-                taskDeadline.setAttribute('value', item.deadline);
-
-                taskTitle.textContent = item.title;
-                taskDescription.textContent = item.description;
-                deleteTask.textContent = 'delete';
-
-                project.appendChild(taskDiv);
-                taskDiv.appendChild(taskTitle);
-                taskDiv.appendChild(taskDescription);
-                taskDiv.appendChild(taskDeadline);
-                taskDiv.appendChild(taskPriority);
-                taskDiv.appendChild(deleteTask);
-
-                deleteTask.addEventListener('click', () => {
-                    project.removeChild(taskDiv);
-                    list = list.filter((obj) => obj != item);
-                    console.log(list);
-                    storeList();
-                });
-            }
+                storeProject();
+            })
         }
     }
 }
