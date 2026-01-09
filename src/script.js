@@ -129,11 +129,14 @@ const toDoForm = (id, projectTitle) => {
     const inputTitle = document.createElement('input');
     const inputDescription = document.createElement('textarea');
     const inputDeadline = document.createElement('input');
-    const inputPriority = document.createElement('select');
-    const highPriority = document.createElement('option');
-    const medPriority = document.createElement('option');
-    const lowPriority = document.createElement('option');
     const submit = document.createElement('button');
+
+    const inputPriority = document.createElement('select');
+    ['high', 'medium', 'low'].forEach(v => {
+        const inputOption = document.createElement('option');
+        inputOption.value = v; inputOption.textContent = v;
+        inputPriority.appendChild(inputOption);
+    })
 
     div.setAttribute('class', 'toDoFormContainer');
     form.setAttribute('class', 'toDoForm');
@@ -148,19 +151,13 @@ const toDoForm = (id, projectTitle) => {
     title.innerText = 'title:';
     description.innerText = 'description:';
     deadline.innerText = 'deadline:';
-    priority.innerText = 'priority:'
-    highPriority.innerText = 'high';
-    medPriority.innerText = 'medium';
-    lowPriority.innerText = 'low';
+    priority.innerText = 'priority:';
     submit.innerText = 'submit';
 
     inputTitle.setAttribute('id', 'title');
     inputDescription.setAttribute('id', 'description');
     inputDeadline.setAttribute('id', 'deadline');
     inputPriority.setAttribute('id', 'priority');
-    highPriority.setAttribute('value', 'high');
-    medPriority.setAttribute('value', 'medium');
-    lowPriority.setAttribute('value', 'low');
 
     // attach to do form below project container
 
@@ -174,9 +171,6 @@ const toDoForm = (id, projectTitle) => {
     form.appendChild(inputDeadline);
     form.appendChild(priority);
     form.appendChild(inputPriority);
-    inputPriority.appendChild(highPriority);
-    inputPriority.appendChild(medPriority);
-    inputPriority.appendChild(lowPriority);
     form.appendChild(submit);
 
     // submit button adds new items to To Do List
@@ -184,7 +178,7 @@ const toDoForm = (id, projectTitle) => {
     submit.addEventListener('click', (event) => {
         event.preventDefault();
 
-        // takes new task and stores it in the list
+        // stores task in array
         let task = new Task(inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, projectTitle, id);
         list.push(task);
 
@@ -206,20 +200,28 @@ function displayList(task) {
 
         const project = document.getElementById(`${task.id}`);
 
-        // create task elements
         const taskDiv = document.createElement('div');
         const taskTitle = document.createElement('p');
         const taskDescription = document.createElement('p');
-        const taskDeadline = document.createElement('input');
         const deleteTask = document.createElement('button');
+        const taskDeadline = document.createElement('input');
 
-        // priority dropdown
+        // checkbox 
+        const label = document.createElement('label');
+        const checkBox = document.createElement('input');
+
+        // priority dropdown 
         const taskPriority = document.createElement('select');
         ['high', 'medium', 'low'].forEach(v => {
             const opt = document.createElement('option');
             opt.value = v; opt.textContent = v;
             taskPriority.appendChild(opt);
         });
+
+        label.setAttribute('for', 'status');
+        checkBox.setAttribute('id', 'status');
+        checkBox.setAttribute('type', 'checkbox');
+        checkBox.setAttribute('name', 'complete');
 
         taskPriority.setAttribute('name', 'priority');
         taskPriority.value = task.priority;
@@ -228,6 +230,7 @@ function displayList(task) {
         taskDeadline.setAttribute('value', task.deadline);
         deleteTask.setAttribute('class', 'delete-task');
 
+        label.textContent = 'complete:';
         taskTitle.textContent = task.title;
         taskDescription.textContent = task.description;
         deleteTask.textContent = 'delete';
@@ -239,6 +242,8 @@ function displayList(task) {
         taskDiv.appendChild(taskDescription);
         taskDiv.appendChild(taskDeadline);
         taskDiv.appendChild(taskPriority);
+        taskDiv.appendChild(label);
+        taskDiv.appendChild(checkBox);
         taskDiv.appendChild(deleteTask);
 
         deleteTask.addEventListener('click', () => {
@@ -247,6 +252,21 @@ function displayList(task) {
             console.log(list);
             storeList();
         })
+
+        // if click taskDeadline, pass taskDeadline.value to... task.deadline to update the object
+        // if click complete, pass checkBox.value to task.prototype.status
+        // storeList() {stringify and get for task.id, task.deadline, and task.status}
+        // retrieveList() {...} 
+        // loadList obtains task.id, deadline, status from retrieveList() 
+        // loadList() changes value of deadline to task.deadline and status to task.status for the item.id that equals task.id
+        // list = [task{}, task{}]
+        // find the task in the list array???
+        // list[1].deadline = taskDeadline.value ??
+
+        // store taskDeadline.value and checkBox.value? 
+        // loadList deadline and checkbox is replaced from storage updates?
+        // loadlist loops through array of items
+        // are they going to update the correct items for deadline and checkbox?
 
     }
 
@@ -346,6 +366,10 @@ function loadList() {
             const taskDeadline = document.createElement('input');
             const deleteTask = document.createElement('button');
 
+            // checkbox 
+            const label = document.createElement('label');
+            const checkBox = document.createElement('input');
+
             // priority dropdown
             const taskPriority = document.createElement('select');
             ['high', 'medium', 'low'].forEach(v => {
@@ -354,6 +378,11 @@ function loadList() {
                 taskPriority.appendChild(opt);
             });
 
+            label.setAttribute('for', 'status');
+            checkBox.setAttribute('id', 'status');
+            checkBox.setAttribute('type', 'checkbox');
+            checkBox.setAttribute('name', 'complete');
+
             taskPriority.setAttribute('name', 'priority');
             taskPriority.value = item.priority;
 
@@ -361,6 +390,7 @@ function loadList() {
             taskDeadline.setAttribute('value', item.deadline);
             deleteTask.setAttribute('class', 'delete-task');
 
+            label.textContent = 'complete:';
             taskTitle.textContent = item.title;
             taskDescription.textContent = item.description;
             deleteTask.textContent = 'delete';
@@ -372,6 +402,8 @@ function loadList() {
             taskDiv.appendChild(taskDescription);
             taskDiv.appendChild(taskDeadline);
             taskDiv.appendChild(taskPriority);
+            taskDiv.appendChild(label);
+            taskDiv.appendChild(checkBox);
             taskDiv.appendChild(deleteTask);
 
             deleteTask.addEventListener('click', () => {
