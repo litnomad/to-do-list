@@ -208,7 +208,7 @@ function displayList(task) {
 
         // checkbox 
         const label = document.createElement('label');
-        const checkBox = document.createElement('input');
+        const taskCheckBox = document.createElement('input');
 
         // priority dropdown 
         const taskPriority = document.createElement('select');
@@ -218,15 +218,16 @@ function displayList(task) {
             taskPriority.appendChild(opt);
         });
 
-        label.setAttribute('for', 'status');
-        checkBox.setAttribute('id', 'status');
-        checkBox.setAttribute('type', 'checkbox');
-        checkBox.setAttribute('name', 'complete');
+        label.setAttribute('for', `${task.title}`);
+        taskCheckBox.setAttribute('id', `${task.title}`);
+        taskCheckBox.setAttribute('type', 'checkbox');
+        taskCheckBox.setAttribute('value', 'checked');
 
         taskPriority.setAttribute('name', 'priority');
         taskPriority.value = task.priority;
 
         taskDeadline.setAttribute('type', 'date');
+        taskDeadline.setAttribute('name', 'deadline');
         taskDeadline.setAttribute('value', task.deadline);
         deleteTask.setAttribute('class', 'delete-task');
 
@@ -243,7 +244,7 @@ function displayList(task) {
         taskDiv.appendChild(taskDeadline);
         taskDiv.appendChild(taskPriority);
         taskDiv.appendChild(label);
-        taskDiv.appendChild(checkBox);
+        taskDiv.appendChild(taskCheckBox);
         taskDiv.appendChild(deleteTask);
 
         deleteTask.addEventListener('click', () => {
@@ -253,20 +254,20 @@ function displayList(task) {
             storeList();
         })
 
-        // if click taskDeadline, pass taskDeadline.value to... task.deadline to update the object
-        // if click complete, pass checkBox.value to task.prototype.status
-        // storeList() {stringify and get for task.id, task.deadline, and task.status}
-        // retrieveList() {...} 
-        // loadList obtains task.id, deadline, status from retrieveList() 
-        // loadList() changes value of deadline to task.deadline and status to task.status for the item.id that equals task.id
-        // list = [task{}, task{}]
-        // find the task in the list array???
-        // list[1].deadline = taskDeadline.value ??
-
-        // store taskDeadline.value and checkBox.value? 
-        // loadList deadline and checkbox is replaced from storage updates?
-        // loadlist loops through array of items
-        // are they going to update the correct items for deadline and checkbox?
+        taskCheckBox.addEventListener('click', () => {
+            const statusUpdate = document.querySelector('input[type="checkbox"]').checked;
+            console.log(statusUpdate);
+            list[list.indexOf(task)].status = statusUpdate;
+            console.log(list);
+            storeList();
+        })
+        taskDeadline.addEventListener('click', () => {
+            const deadlineUpdate = document.querySelector('input[type=date]').value;
+            console.log(deadlineUpdate);
+            list[list.indexOf(task)].deadline = deadlineUpdate;
+            console.log(list);
+            storeList();
+        })
 
     }
 
@@ -368,7 +369,7 @@ function loadList() {
 
             // checkbox 
             const label = document.createElement('label');
-            const checkBox = document.createElement('input');
+            const taskCheckBox = document.createElement('input');
 
             // priority dropdown
             const taskPriority = document.createElement('select');
@@ -378,15 +379,19 @@ function loadList() {
                 taskPriority.appendChild(opt);
             });
 
-            label.setAttribute('for', 'status');
-            checkBox.setAttribute('id', 'status');
-            checkBox.setAttribute('type', 'checkbox');
-            checkBox.setAttribute('name', 'complete');
+            label.setAttribute('for', `${item.title}`);
+            taskCheckBox.setAttribute('id', `${item.title}`);
+            taskCheckBox.setAttribute('type', 'checkbox');
+            taskCheckBox.setAttribute('value', 'checked');
+
+            if (item.status === true) { taskCheckBox.checked = true; }
+            else if (item.status === false) { taskCheckBox.checked = false; }
 
             taskPriority.setAttribute('name', 'priority');
             taskPriority.value = item.priority;
 
             taskDeadline.setAttribute('type', 'date');
+            taskDeadline.setAttribute('name', 'deadline');
             taskDeadline.setAttribute('value', item.deadline);
             deleteTask.setAttribute('class', 'delete-task');
 
@@ -403,12 +408,28 @@ function loadList() {
             taskDiv.appendChild(taskDeadline);
             taskDiv.appendChild(taskPriority);
             taskDiv.appendChild(label);
-            taskDiv.appendChild(checkBox);
+            taskDiv.appendChild(taskCheckBox);
             taskDiv.appendChild(deleteTask);
 
             deleteTask.addEventListener('click', () => {
                 project.removeChild(taskDiv);
                 list = list.filter((obj) => obj != item);
+                console.log(list);
+                storeList();
+            })
+
+            taskCheckBox.addEventListener('click', () => {
+                const statusUpdate = document.querySelector('input[type="checkbox"]').checked;
+                console.log(statusUpdate);
+                console.log(list.indexOf(item));
+                list[list.indexOf(item)].status = statusUpdate;
+                console.log(list);
+                storeList();
+            })
+            taskDeadline.addEventListener('click', () => {
+                const deadlineUpdate = document.querySelector('input[type="date"]').value;
+                console.log(deadlineUpdate);
+                list[list.indexOf(item)].deadline = deadlineUpdate;
                 console.log(list);
                 storeList();
             })
