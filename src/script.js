@@ -254,15 +254,15 @@ function displayList(task) {
             storeList();
         })
 
-        taskCheckBox.addEventListener('click', () => {
-            const statusUpdate = document.querySelector('input[type="checkbox"]').checked;
+        taskCheckBox.addEventListener('click', (event) => {
+            const statusUpdate = event.target.checked;
             console.log(statusUpdate);
             list[list.indexOf(task)].status = statusUpdate;
             console.log(list);
             storeList();
         })
-        taskDeadline.addEventListener('click', () => {
-            const deadlineUpdate = document.querySelector('input[type=date]').value;
+        taskDeadline.addEventListener('click', (event) => {
+            const deadlineUpdate = event.target.value;
             console.log(deadlineUpdate);
             list[list.indexOf(task)].deadline = deadlineUpdate;
             console.log(list);
@@ -418,16 +418,17 @@ function loadList() {
                 storeList();
             })
 
-            taskCheckBox.addEventListener('click', () => {
-                const statusUpdate = document.querySelector('input[type="checkbox"]').checked;
+            taskCheckBox.addEventListener('click', (event) => {
+                const statusUpdate = event.target.checked;
                 console.log(statusUpdate);
                 console.log(list.indexOf(item));
                 list[list.indexOf(item)].status = statusUpdate;
                 console.log(list);
                 storeList();
             })
-            taskDeadline.addEventListener('click', () => {
-                const deadlineUpdate = document.querySelector('input[type="date"]').value;
+
+            taskDeadline.addEventListener('click', (event) => {
+                const deadlineUpdate = event.target.value;
                 console.log(deadlineUpdate);
                 list[list.indexOf(item)].deadline = deadlineUpdate;
                 console.log(list);
