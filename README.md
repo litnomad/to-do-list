@@ -12,3 +12,5 @@ JS or ES6 modules are exported into HTML and are bundled with the use of Webpack
 - Change deadlines and priorities
 - Mark checkboxes as complete
 - Local storage saves projects in the browser
+
+See [example](https://htmlpreview.github.io/?https://github.com/litnomad/to-do-list/blob/93bcdc6830c94afc1c3c485ce88f00138884a709/index.html).
