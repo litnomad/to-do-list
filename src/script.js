@@ -1,8 +1,10 @@
 import "./style.css";
 
-// array for created projects
+// arrays for lists and projects
+let list = [];
 let projects = [];
 
+// project constructor
 class Project {
     constructor(project, id) {
         this.project = project;
@@ -10,9 +12,15 @@ class Project {
     }
 }
 
-// array for created tasks
-let list = [];
+// push constructed projects into its array
+function projectArray(name, ref) {
+    let proj = new Project(name, ref);
+    projects.push(proj);
+    storeProject();
+    return { proj };
+}
 
+// task constructor
 class Task {
     constructor(title, description, deadline, priority, projectTitle, id) {
         this.title = title;
@@ -22,6 +30,28 @@ class Task {
         this.project = projectTitle;
         this.id = id;
     }
+}
+
+// function set to dos as complete
+const markComplete = (event, item) => {
+    list[list.indexOf(item)].status = event.target.checked;
+    console.log(list);
+    storeList();
+
+};
+
+// function to change to do priority
+const changePriority = (event, item) => {
+    list[list.indexOf(item)].priority = event.target.value;
+    console.log(list);
+    storeList();
+}
+
+// function to change deadline
+const changeDeadline = (event, item) => {
+    list[list.indexOf(item)].deadline = event.target.value;
+    console.log(list);
+    storeList();
 }
 
 // toggle pop up form for adding new projects
@@ -52,15 +82,6 @@ submitButton.addEventListener('click', (event) => {
     hideForm(".form-popup");
 })
 
-// function for creating and pushing projects into an array
-
-function projectArray(name, ref) {
-    let proj = new Project(name, ref);
-    projects.push(proj);
-    storeProject();
-    return { proj };
-}
-
 // how project will be displayed on page
 
 const createProject = () => {
@@ -71,15 +92,6 @@ const createProject = () => {
     const toDoButton = document.createElement('button');
     const id = window.crypto.randomUUID();
     const deleteProject = document.createElement('button');
-
-    // return true when pop up submit button is clicked
-    // if pop up submit is true, then projectTitle = input[id=title] and id = random
-    // call projectArray() to push new project into projects array
-    // else projectTitle = projects.title and id = projects.id, and toDoForm(projects.id, ..)
-    // do not call projectArray in loadProjects()...
-    // filter array...
-    // should I use factory function to return hidden variables 
-    // return div, h3, if..then.., append,  
 
     div.setAttribute('id', id);
     toDoButton.setAttribute('type', 'submit');
@@ -179,6 +191,7 @@ const toDoForm = (id, projectTitle) => {
         event.preventDefault();
 
         // stores task in array
+        // creates to do item that is separate from DOM?
         let task = new Task(inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, projectTitle, id);
         list.push(task);
 
@@ -255,18 +268,15 @@ function displayList(task) {
         })
 
         taskCheckBox.addEventListener('click', (event) => {
-            const statusUpdate = event.target.checked;
-            console.log(statusUpdate);
-            list[list.indexOf(task)].status = statusUpdate;
-            console.log(list);
-            storeList();
+            markComplete(event, task);
         })
+
         taskDeadline.addEventListener('click', (event) => {
-            const deadlineUpdate = event.target.value;
-            console.log(deadlineUpdate);
-            list[list.indexOf(task)].deadline = deadlineUpdate;
-            console.log(list);
-            storeList();
+            changeDeadline(event, task);
+        })
+
+        taskPriority.addEventListener('click', (event) => {
+            changePriority(event, task);
         })
 
     }
@@ -419,20 +429,15 @@ function loadList() {
             })
 
             taskCheckBox.addEventListener('click', (event) => {
-                const statusUpdate = event.target.checked;
-                console.log(statusUpdate);
-                console.log(list.indexOf(item));
-                list[list.indexOf(item)].status = statusUpdate;
-                console.log(list);
-                storeList();
+                markComplete(event, item);
             })
 
             taskDeadline.addEventListener('click', (event) => {
-                const deadlineUpdate = event.target.value;
-                console.log(deadlineUpdate);
-                list[list.indexOf(item)].deadline = deadlineUpdate;
-                console.log(list);
-                storeList();
+                changeDeadline(event, item);
+            })
+
+            taskPriority.addEventListener('click', (event) => {
+                changePriority(event, item);
             })
         }
     }
