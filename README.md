@@ -4,7 +4,7 @@ To do list app that allows users to create and keep track of projects, prioritie
 ## Objective
 The objective of this project is to create a to do list app that allows the user to add projects and then add to do lists to the desired project. 'Todos' are created as objects with constructors or classes. All projects with to do lists that can be modified or deleted will be displayed on the page as a result.
 
-JS or ES6 modules are exported into HTML and are bundled with the use of Webpack javascript bundler.
+Javascript ES6 modules are exported into HTML and are bundled with Webpack.
 
 ## Features
 - Add projects
