@@ -28,15 +28,6 @@ form>* {
     margin: 10px;
 }
 
-.form-popup {
-    display: none;
-    position: fixed;
-    bottom: 50px;
-    right: 50px;
-    border: 1px solid cadetblue;
-    z-index: 9;
-}
-
 .card {
     border: 1px solid cadetblue;
     padding: 10px;
