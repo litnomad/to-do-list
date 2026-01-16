@@ -80,7 +80,7 @@ export function deleteProject(proj) {
 }
 
 // for retrieving local storage
-export function retrieveProject() {
+export function retrieveProjectData() {
 
     const storedProjectData = localStorage.getItem('projects');
 
@@ -92,7 +92,7 @@ export function retrieveProject() {
     }
 }
 
-export function retrieveList() {
+export function retrieveListData() {
 
     const storedListData = localStorage.getItem('list');
 

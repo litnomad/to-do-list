@@ -1,4 +1,4 @@
-import { createToDoItem, createProject, changeDeadline, changePriority, markComplete, deleteTodo, deleteProject, retrieveProject, retrieveList, projects, list } from './applicationlogic.js'
+import { createToDoItem, createProject, changeDeadline, changePriority, markComplete, deleteTodo, deleteProject, retrieveProjectData, retrieveListData, projects, list } from './applicationlogic.js'
 
 const main = document.querySelector('#main');
 const sidebar = document.querySelector('#sidebar');
@@ -35,22 +35,23 @@ confirm.addEventListener('click', (event) => {
 
 const createProjectElements = (projectId, projectTitle) => {
 
-    const div = document.createElement('div');
-    const h3 = document.createElement('h3');
+    const projectDiv = document.createElement('div');
+    const header = document.createElement('h3');
     const toDoButton = document.createElement('button');
     const deleteProject = document.createElement('button');
 
-    div.setAttribute('id', projectId);
+    projectDiv.setAttribute('class', projectTitle);
+    projectDiv.setAttribute('id', projectId);
     toDoButton.setAttribute('type', 'submit');
 
-    h3.textContent = projectTitle;
+    header.textContent = projectTitle;
     toDoButton.textContent = 'add to do list';
     deleteProject.textContent = 'delete project';
 
-    main.appendChild(div);
-    div.appendChild(h3);
-    div.appendChild(toDoButton);
-    div.appendChild(deleteProject);
+    main.appendChild(projectDiv);
+    projectDiv.appendChild(header);
+    projectDiv.appendChild(toDoButton);
+    projectDiv.appendChild(deleteProject);
 
     toDoButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -68,7 +69,7 @@ const createProjectElements = (projectId, projectTitle) => {
     });
 
     deleteProject.addEventListener('click', () => {
-        main.removeChild(div);
+        main.removeChild(projectDiv);
     })
 
 }
@@ -159,118 +160,110 @@ const toDoForm = (projectTitle, projectId) => {
 
 function displayList(task) {
 
-    if (document.getElementById(`${task.id}`)) {
+    const project = document.getElementById(`${task.id}`);
 
-        const project = document.getElementById(`${task.id}`);
+    // to do elements
+    const taskDiv = document.createElement('div');
+    const taskTitle = document.createElement('p');
+    const taskDescription = document.createElement('p');
+    const deleteTask = document.createElement('button');
+    const taskDeadline = document.createElement('input');
 
-        const taskDiv = document.createElement('div');
-        const taskTitle = document.createElement('p');
-        const taskDescription = document.createElement('p');
-        const deleteTask = document.createElement('button');
-        const taskDeadline = document.createElement('input');
+    // checkbox elements
+    const label = document.createElement('label');
+    const taskCheckBox = document.createElement('input');
 
-        // checkbox 
-        const label = document.createElement('label');
-        const taskCheckBox = document.createElement('input');
+    // priority dropdown elements
+    const taskPriority = document.createElement('select');
+    ['high', 'medium', 'low'].forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v; opt.textContent = v;
+        taskPriority.appendChild(opt);
+    });
 
-        // priority dropdown 
-        const taskPriority = document.createElement('select');
-        ['high', 'medium', 'low'].forEach(v => {
-            const opt = document.createElement('option');
-            opt.value = v; opt.textContent = v;
-            taskPriority.appendChild(opt);
-        });
+    label.setAttribute('for', task.title);
+    taskCheckBox.setAttribute('id', task.title);
+    taskCheckBox.setAttribute('type', 'checkbox');
 
-        label.setAttribute('for', `${task.title}`);
-        taskCheckBox.setAttribute('id', `${task.title}`);
-        taskCheckBox.setAttribute('type', 'checkbox');
-        taskCheckBox.setAttribute('value', 'checked');
+    taskPriority.setAttribute('name', 'priority');
+    taskPriority.value = task.priority;
 
-        taskPriority.setAttribute('name', 'priority');
-        taskPriority.value = task.priority;
+    taskDeadline.setAttribute('type', 'date');
+    taskDeadline.setAttribute('name', 'deadline');
+    taskDeadline.setAttribute('value', task.deadline);
+    deleteTask.setAttribute('class', 'delete-task');
 
-        taskDeadline.setAttribute('type', 'date');
-        taskDeadline.setAttribute('name', 'deadline');
-        taskDeadline.setAttribute('value', task.deadline);
-        deleteTask.setAttribute('class', 'delete-task');
+    label.textContent = 'complete:';
+    taskTitle.textContent = task.title;
+    taskDescription.textContent = task.description;
+    deleteTask.textContent = 'delete';
 
-        label.textContent = 'complete:';
-        taskTitle.textContent = task.title;
-        taskDescription.textContent = task.description;
-        deleteTask.textContent = 'delete';
+    project.appendChild(taskDiv);
+    console.log('appending taskDiv for', task.title, taskDiv)
+    taskDiv.appendChild(taskTitle);
+    taskDiv.appendChild(taskDescription);
+    taskDiv.appendChild(taskDeadline);
+    taskDiv.appendChild(taskPriority);
+    taskDiv.appendChild(label);
+    taskDiv.appendChild(taskCheckBox);
+    taskDiv.appendChild(deleteTask);
 
-        // taskDiv keeps getting replaced with each iteration?
-        project.appendChild(taskDiv);
-        console.log('appending taskDiv for', task.title, taskDiv)
-        taskDiv.appendChild(taskTitle);
-        taskDiv.appendChild(taskDescription);
-        taskDiv.appendChild(taskDeadline);
-        taskDiv.appendChild(taskPriority);
-        taskDiv.appendChild(label);
-        taskDiv.appendChild(taskCheckBox);
-        taskDiv.appendChild(deleteTask);
+    deleteTask.addEventListener('click', () => {
+        project.removeChild(taskDiv);
+        deleteTodo(task);
+    })
 
-        deleteTask.addEventListener('click', () => {
-            project.removeChild(taskDiv);
-            deleteTodo(task);
-        })
+    taskCheckBox.addEventListener('click', (event) => {
+        markComplete(event, task);
+    })
 
-        taskCheckBox.addEventListener('click', (event) => {
-            markComplete(event, task);
-        })
+    taskDeadline.addEventListener('change', () => {
+        const dateSelected = taskDeadline.value;
+        changeDeadline(dateSelected, task);
+    })
 
-        taskDeadline.addEventListener('change', () => {
-            const dateSelected = taskDeadline.value;
-            changeDeadline(dateSelected, task);
-        })
-
-        taskPriority.addEventListener('change', () => {
-            const prioritySelected = taskPriority.value;
-            changePriority(prioritySelected, task);
-        })
-
-    }
+    taskPriority.addEventListener('change', () => {
+        const prioritySelected = taskPriority.value;
+        changePriority(prioritySelected, task);
+    })
 
 }
 
 // renders page from local storage
 
-retrieveProject();
-console.log(projects);
-retrieveList();
-console.log(list);
-
 function loadProjects() {
+
+    retrieveProjectData();
 
     for (const proj of projects) {
 
-        // create projects
-        const div = document.createElement('div');
-        const h3 = document.createElement('h3');
+        const projectDiv = document.createElement('div');
+        const header = document.createElement('h3');
         const toDoButton = document.createElement('button');
         const deleteProjectButton = document.createElement('button');
 
         const projectId = proj.id;
         const projectTitle = proj.project;
 
-        div.setAttribute('id', projectId);
+        projectDiv.setAttribute('class', projectTitle);
+        projectDiv.setAttribute('id', projectId);
         toDoButton.setAttribute('type', 'submit');
 
-        h3.textContent = projectTitle;
+        header.textContent = projectTitle;
         toDoButton.textContent = 'add to do list';
         deleteProjectButton.textContent = 'delete project';
 
-        main.appendChild(div);
-        div.appendChild(h3);
-        div.appendChild(toDoButton);
-        div.appendChild(deleteProjectButton);
+        main.appendChild(projectDiv);
+        projectDiv.appendChild(header);
+        projectDiv.appendChild(toDoButton);
+        projectDiv.appendChild(deleteProjectButton);
 
         toDoButton.addEventListener('click', (event) => {
             event.preventDefault();
             // creates dialog 
             createToDoFormDialog(projectId);
             // opens dialog 
-            const dialogSelector = document.querySelector(`dialog[id="${projectTitle}"]`);
+            const dialogSelector = document.querySelector(`dialog[id="${projectId}"]`);
             if (dialogSelector) {
                 // fixes fail to show modal because of open dialog bug
                 if (dialogSelector.hasAttribute('open')) { dialogSelector.close() }
@@ -281,7 +274,7 @@ function loadProjects() {
         });
 
         deleteProjectButton.addEventListener('click', () => {
-            main.removeChild(div);
+            main.removeChild(projectDiv);
             deleteProject(proj);
         })
 
@@ -290,90 +283,81 @@ function loadProjects() {
 
 function loadList() {
 
-    if (!list) {
-        console.log('Load list failed. No list data found in local storage.');
-        return;
-    }
+    retrieveListData();
 
     for (const item of list) {
 
-        if (document.getElementById(`${item.id}`)) {
+        const project = document.getElementById(`${item.id}`);
 
-            const project = document.getElementById(`${item.id}`);
+        // to do elements
+        const taskDiv = document.createElement('div');
+        const taskTitle = document.createElement('p');
+        const taskDescription = document.createElement('p');
+        const taskDeadline = document.createElement('input');
+        const deleteTask = document.createElement('button');
 
-            // to do elements
-            const taskDiv = document.createElement('div');
-            const taskTitle = document.createElement('p');
-            const taskDescription = document.createElement('p');
-            const taskDeadline = document.createElement('input');
-            const deleteTask = document.createElement('button');
+        // checkbox elements
+        const label = document.createElement('label');
+        const taskCheckBox = document.createElement('input');
 
-            // checkbox elements
-            const label = document.createElement('label');
-            const taskCheckBox = document.createElement('input');
+        // priority dropdown elements
+        const taskPriority = document.createElement('select');
+        ['high', 'medium', 'low'].forEach(v => {
+            const opt = document.createElement('option');
+            opt.value = v; opt.textContent = v;
+            taskPriority.appendChild(opt);
+        });
 
-            // priority dropdown elements
-            const taskPriority = document.createElement('select');
-            ['high', 'medium', 'low'].forEach(v => {
-                const opt = document.createElement('option');
-                opt.value = v; opt.textContent = v;
-                taskPriority.appendChild(opt);
-            });
+        label.setAttribute('for', item.title);
+        taskCheckBox.setAttribute('id', item.title);
+        taskCheckBox.setAttribute('type', 'checkbox');
+        taskCheckBox.setAttribute('value', 'complete');
+        taskCheckBox.checked = item.status;
 
-            label.setAttribute('for', `${item.title}`);
-            taskCheckBox.setAttribute('id', `${item.title}`);
-            taskCheckBox.setAttribute('type', 'checkbox');
-            taskCheckBox.setAttribute('value', 'checked');
+        taskPriority.setAttribute('name', 'priority');
+        taskPriority.value = item.priority;
 
-            if (item.status === true) { taskCheckBox.checked = true; }
-            else if (item.status === false) { taskCheckBox.checked = false; }
+        taskDeadline.setAttribute('type', 'date');
+        taskDeadline.setAttribute('name', 'deadline');
+        taskDeadline.setAttribute('value', item.deadline);
+        deleteTask.setAttribute('class', 'delete-task');
 
-            taskPriority.setAttribute('name', 'priority');
-            taskPriority.value = item.priority;
+        label.textContent = 'complete:';
+        taskTitle.textContent = item.title;
+        taskDescription.textContent = item.description;
+        deleteTask.textContent = 'delete';
 
-            taskDeadline.setAttribute('type', 'date');
-            taskDeadline.setAttribute('name', 'deadline');
-            taskDeadline.setAttribute('value', item.deadline);
-            deleteTask.setAttribute('class', 'delete-task');
+        project.appendChild(taskDiv);
+        console.log('appending taskDiv for', item.title, taskDiv)
+        taskDiv.appendChild(taskTitle);
+        taskDiv.appendChild(taskDescription);
+        taskDiv.appendChild(taskDeadline);
+        taskDiv.appendChild(taskPriority);
+        taskDiv.appendChild(label);
+        taskDiv.appendChild(taskCheckBox);
+        taskDiv.appendChild(deleteTask);
 
-            label.textContent = 'complete:';
-            taskTitle.textContent = item.title;
-            taskDescription.textContent = item.description;
-            deleteTask.textContent = 'delete';
+        deleteTask.addEventListener('click', () => {
+            project.removeChild(taskDiv);
+            deleteTodo(item);
+        })
 
-            // taskDiv keeps getting replaced with each iteration?
-            project.appendChild(taskDiv);
-            console.log('appending taskDiv for', item.title, taskDiv)
-            taskDiv.appendChild(taskTitle);
-            taskDiv.appendChild(taskDescription);
-            taskDiv.appendChild(taskDeadline);
-            taskDiv.appendChild(taskPriority);
-            taskDiv.appendChild(label);
-            taskDiv.appendChild(taskCheckBox);
-            taskDiv.appendChild(deleteTask);
+        taskCheckBox.addEventListener('click', (event) => {
+            markComplete(event, item);
+        })
 
-            deleteTask.addEventListener('click', () => {
-                project.removeChild(taskDiv);
-                deleteTodo(item);
-            })
+        taskDeadline.addEventListener('change', () => {
+            const dateSelected = taskDeadline.value;
+            changeDeadline(dateSelected, item);
+        })
 
-            taskCheckBox.addEventListener('click', (event) => {
-                markComplete(event, item);
-            })
-
-            taskDeadline.addEventListener('change', () => {
-                const dateSelected = taskDeadline.value;
-                changeDeadline(dateSelected, item);
-            })
-
-            taskPriority.addEventListener('change', () => {
-                const prioritySelected = taskPriority.value;
-                changePriority(prioritySelected, item);
-            })
-
-        }
+        taskPriority.addEventListener('change', () => {
+            const prioritySelected = taskPriority.value;
+            changePriority(prioritySelected, item);
+        })
 
     }
+
 }
 
 loadProjects();
