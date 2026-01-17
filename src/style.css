@@ -13,12 +13,16 @@ body {
 }
 
 #main {
-    padding: 0px 10px;
-    /* top-bottom right-left */
+    width: 100%;
 }
 
-.logo {
+#logo {
     font-size: 26px;
+    margin: 10px 0px 20px 0px;
+}
+
+#openDialog {
+    font-size: 36px;
     margin: 10px 0px 20px 0px;
     /* top right bottom left */
 }
@@ -28,7 +32,27 @@ form>* {
     margin: 10px;
 }
 
-.card {
-    border: 1px solid cadetblue;
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.headerLinks {
+    display: flex;
+    gap: 10px;
+}
+
+.projectDiv {
+    border: 1px solid lightblue;
     padding: 10px;
+    margin: 10px;
+}
+
+.taskDiv {
+    width: 100%;
+    display: flex;
+    height: fit-content;
+    align-items: center;
+    gap: 20px;
 }

@@ -10,18 +10,18 @@
 <body>
     <div id="sidebar">
         <header>
-            <p class="logo">To Do List</p>
+            <p id="logo">To Do List</p>
         </header>
-        <a class="openDialog">+</a>
+        <div id="sidebarLinks"></div>
+        <a id="openDialog">+</a>
     </div>
     <div id="main">
-        <p>Your life starts here.</p>
         <dialog>
             <form action="">
                 <label for="title">Project:</label>
-                <input type="text" id="title" value="default">
-                <button type="submit" id="confirmBtn" value="default">confirm</button>
-                <button autofocus value="cancel" formmethod="dialog">cancel</button>
+                <input type="text" id="title" value="Default">
+                <button type="submit" id="confirmBtn" value="Default">confirm</button>
+                <button value="cancel" formmethod="dialog">cancel</button>
             </form>
         </dialog>
     </div>
