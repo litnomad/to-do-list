@@ -1,9 +1,9 @@
 import { createToDoItem, createProject, changeDeadline, changePriority, markComplete, deleteTodo, deleteProject, retrieveProjectData, retrieveListData, projects, list } from './applicationlogic.js'
 
 const main = document.querySelector('#main');
-const sidebar = document.querySelector('#sidebar');
+const sidebar = document.querySelector('#sidebarLinks');
 const dialog = document.querySelector('dialog');
-const showButton = document.querySelector('.openDialog');
+const showButton = document.querySelector('#openDialog');
 const closeButton = document.querySelector('dialog button');
 const confirm = document.querySelector('#confirmBtn')
 const inputProject = document.querySelector('input#title');
@@ -28,7 +28,6 @@ confirm.addEventListener('click', (event) => {
     createProject(projectId, projectTitle);
     // displays project on page
     createProjectElements(projectId, projectTitle);
-
 })
 
 // how project will be displayed on page
@@ -36,11 +35,15 @@ confirm.addEventListener('click', (event) => {
 const createProjectElements = (projectId, projectTitle) => {
 
     const projectDiv = document.createElement('div');
+    const headerContainer = document.createElement('div');
     const header = document.createElement('h3');
+    const links = document.createElement('div');
     const toDoButton = document.createElement('button');
     const deleteProject = document.createElement('button');
 
-    projectDiv.setAttribute('class', projectTitle);
+    headerContainer.setAttribute('class', 'header');
+    links.setAttribute('class', 'headerLinks');
+    projectDiv.setAttribute('class', 'projectDiv');
     projectDiv.setAttribute('id', projectId);
     toDoButton.setAttribute('type', 'submit');
 
@@ -49,9 +52,11 @@ const createProjectElements = (projectId, projectTitle) => {
     deleteProject.textContent = 'delete project';
 
     main.appendChild(projectDiv);
-    projectDiv.appendChild(header);
-    projectDiv.appendChild(toDoButton);
-    projectDiv.appendChild(deleteProject);
+    projectDiv.appendChild(headerContainer);
+    headerContainer.appendChild(header);
+    headerContainer.appendChild(links);
+    links.appendChild(toDoButton);
+    links.appendChild(deleteProject);
 
     toDoButton.addEventListener('click', (event) => {
         event.preventDefault();
@@ -89,6 +94,13 @@ const createToDoFormDialog = (projectId) => {
     return dial;
 }
 
+dial.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        dial.innerHTML = '';
+        dial.remove();
+    }
+});
+
 // creates to do form elements 
 
 const toDoForm = (projectTitle, projectId) => {
@@ -102,6 +114,7 @@ const toDoForm = (projectTitle, projectId) => {
     const inputDescription = document.createElement('textarea');
     const inputDeadline = document.createElement('input');
     const submit = document.createElement('button');
+    const cancel = document.createElement('button');
 
     const inputPriority = document.createElement('select');
     ['high', 'medium', 'low'].forEach(v => {
@@ -112,20 +125,25 @@ const toDoForm = (projectTitle, projectId) => {
 
     form.setAttribute('class', 'toDoForm');
     form.setAttribute('method', 'dialog');
-
-    inputDeadline.setAttribute('type', 'date');
-
+    inputDeadline.setAttribute('type', 'datetime-local');
     submit.setAttribute('type', 'submit');
+
+    inputTitle.setAttribute('name', 'title');
+    inputDescription.setAttribute('name', 'description');
+    inputDeadline.setAttribute('name', 'deadline');
+    inputPriority.setAttribute('name', 'priority');
+
     title.setAttribute('for', 'title');
     description.setAttribute('for', 'description');
     deadline.setAttribute('for', 'deadline');
     priority.setAttribute('for', 'priority');
 
-    title.innerText = 'title:';
-    description.innerText = 'description:';
-    deadline.innerText = 'deadline:';
-    priority.innerText = 'priority:';
-    submit.innerText = 'submit';
+    title.textContent = 'title:';
+    description.textContent = 'description:';
+    deadline.textContent = 'deadline:';
+    priority.textContent = 'priority:';
+    submit.textContent = 'submit';
+    cancel.textContent = 'cancel';
 
     inputTitle.setAttribute('id', 'title');
     inputDescription.setAttribute('id', 'description');
@@ -142,36 +160,42 @@ const toDoForm = (projectTitle, projectId) => {
     form.appendChild(priority);
     form.appendChild(inputPriority);
     form.appendChild(submit);
+    form.appendChild(cancel);
 
     submit.addEventListener('click', (event) => {
         event.preventDefault();
         // sends form data of to do item to application logic
-        let task = createToDoItem(projectTitle, projectId, inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, false).getItem();
+        let item = createToDoItem(projectTitle, projectId, inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, false).getItem();
         // resets dial node for next element create
         dial.innerHTML = '';
         dial.remove();
         // creates elements for to do item
-        displayList(task);
+        displayList(item);
     });
+
+    cancel.addEventListener('click', () => {
+        dial.close();
+        // resets dial node for next element create
+        dial.innerHTML = '';
+        dial.remove();
+    })
 
 }
 
 // how tasks will be displayed on page 
 
-function displayList(task) {
+function displayList(item) {
 
-    const project = document.getElementById(`${task.id}`);
+    const project = document.getElementById(`${item.id}`);
 
     // to do elements
     const taskDiv = document.createElement('div');
     const taskTitle = document.createElement('p');
     const taskDescription = document.createElement('p');
-    const deleteTask = document.createElement('button');
     const taskDeadline = document.createElement('input');
-
-    // checkbox elements
-    const label = document.createElement('label');
-    const taskCheckBox = document.createElement('input');
+    const taskCompleteLabel = document.createElement('label');
+    const taskComplete = document.createElement('input');
+    const deleteTask = document.createElement('button');
 
     // priority dropdown elements
     const taskPriority = document.createElement('select');
@@ -181,50 +205,54 @@ function displayList(task) {
         taskPriority.appendChild(opt);
     });
 
-    label.setAttribute('for', task.title);
-    taskCheckBox.setAttribute('id', task.title);
-    taskCheckBox.setAttribute('type', 'checkbox');
+    taskDiv.setAttribute('class', 'taskDiv');
+    deleteTask.setAttribute('class', 'deleteTask');
+
+    taskCompleteLabel.setAttribute('for', 'complete');
+    taskComplete.setAttribute('id', 'complete');
+
+    taskComplete.setAttribute('type', 'checkbox');
+    taskDeadline.setAttribute('type', 'datetime-local');
 
     taskPriority.setAttribute('name', 'priority');
-    taskPriority.value = task.priority;
-
-    taskDeadline.setAttribute('type', 'date');
     taskDeadline.setAttribute('name', 'deadline');
-    taskDeadline.setAttribute('value', task.deadline);
-    deleteTask.setAttribute('class', 'delete-task');
+    taskComplete.setAttribute('name', item.title);
 
-    label.textContent = 'complete:';
-    taskTitle.textContent = task.title;
-    taskDescription.textContent = task.description;
+    taskDeadline.setAttribute('value', item.deadline);
+    taskPriority.value = item.priority;
+
+    taskCompleteLabel.textContent = 'complete:';
+    taskTitle.textContent = item.title;
+    taskDescription.textContent = item.description;
     deleteTask.textContent = 'delete';
 
     project.appendChild(taskDiv);
-    console.log('appending taskDiv for', task.title, taskDiv)
+    console.log('appending taskDiv for', item.title, taskDiv)
     taskDiv.appendChild(taskTitle);
     taskDiv.appendChild(taskDescription);
     taskDiv.appendChild(taskDeadline);
     taskDiv.appendChild(taskPriority);
-    taskDiv.appendChild(label);
-    taskDiv.appendChild(taskCheckBox);
+    taskDiv.appendChild(taskCompleteLabel);
+    taskDiv.appendChild(taskComplete);
     taskDiv.appendChild(deleteTask);
 
     deleteTask.addEventListener('click', () => {
         project.removeChild(taskDiv);
-        deleteTodo(task);
+        deleteTodo(item);
     })
 
-    taskCheckBox.addEventListener('click', (event) => {
-        markComplete(event, task);
+    taskComplete.addEventListener('click', (event) => {
+        markComplete(event, item);
     })
 
     taskDeadline.addEventListener('change', () => {
         const dateSelected = taskDeadline.value;
-        changeDeadline(dateSelected, task);
+        changeDeadline(dateSelected, item);
     })
 
     taskPriority.addEventListener('change', () => {
         const prioritySelected = taskPriority.value;
-        changePriority(prioritySelected, task);
+        changePriority(prioritySelected, item);
     })
 
 }
@@ -238,14 +266,18 @@ function loadProjects() {
     for (const proj of projects) {
 
         const projectDiv = document.createElement('div');
+        const headerContainer = document.createElement('div');
         const header = document.createElement('h3');
+        const links = document.createElement('div');
         const toDoButton = document.createElement('button');
         const deleteProjectButton = document.createElement('button');
 
         const projectId = proj.id;
         const projectTitle = proj.project;
 
-        projectDiv.setAttribute('class', projectTitle);
+        headerContainer.setAttribute('class', 'header');
+        links.setAttribute('class', 'headerLinks')
+        projectDiv.setAttribute('class', 'projectDiv');
         projectDiv.setAttribute('id', projectId);
         toDoButton.setAttribute('type', 'submit');
 
@@ -254,9 +286,11 @@ function loadProjects() {
         deleteProjectButton.textContent = 'delete project';
 
         main.appendChild(projectDiv);
-        projectDiv.appendChild(header);
-        projectDiv.appendChild(toDoButton);
-        projectDiv.appendChild(deleteProjectButton);
+        projectDiv.appendChild(headerContainer);
+        headerContainer.appendChild(header);
+        headerContainer.appendChild(links);
+        links.appendChild(toDoButton);
+        links.appendChild(deleteProjectButton);
 
         toDoButton.addEventListener('click', (event) => {
             event.preventDefault();
@@ -294,11 +328,9 @@ function loadList() {
         const taskTitle = document.createElement('p');
         const taskDescription = document.createElement('p');
         const taskDeadline = document.createElement('input');
+        const taskCompleteLabel = document.createElement('label');
+        const taskComplete = document.createElement('input');
         const deleteTask = document.createElement('button');
-
-        // checkbox elements
-        const label = document.createElement('label');
-        const taskCheckBox = document.createElement('input');
 
         // priority dropdown elements
         const taskPriority = document.createElement('select');
@@ -308,24 +340,28 @@ function loadList() {
             taskPriority.appendChild(opt);
         });
 
-        label.setAttribute('for', item.title);
-        taskCheckBox.setAttribute('id', item.title);
-        taskCheckBox.setAttribute('type', 'checkbox');
-        taskCheckBox.setAttribute('value', 'complete');
-        taskCheckBox.checked = item.status;
+        taskDiv.setAttribute('class', 'taskDiv');
+        deleteTask.setAttribute('class', 'deleteTask');
+
+        taskComplete.setAttribute('type', 'checkbox');
+        taskDeadline.setAttribute('type', 'datetime-local');
 
         taskPriority.setAttribute('name', 'priority');
-        taskPriority.value = item.priority;
-
-        taskDeadline.setAttribute('type', 'date');
         taskDeadline.setAttribute('name', 'deadline');
-        taskDeadline.setAttribute('value', item.deadline);
-        deleteTask.setAttribute('class', 'delete-task');
+        taskComplete.setAttribute('name', item.title);
 
-        label.textContent = 'complete:';
+        taskComplete.setAttribute('value', 'complete');
+        taskDeadline.setAttribute('value', item.deadline);
+
+        taskCompleteLabel.textContent = 'complete:';
         taskTitle.textContent = item.title;
         taskDescription.textContent = item.description;
         deleteTask.textContent = 'delete';
+
+        taskPriority.value = item.priority;
+        taskComplete.checked = item.status;
+
+        taskCompleteLabel.appendChild(taskComplete);
 
         project.appendChild(taskDiv);
         console.log('appending taskDiv for', item.title, taskDiv)
@@ -333,8 +369,7 @@ function loadList() {
         taskDiv.appendChild(taskDescription);
         taskDiv.appendChild(taskDeadline);
         taskDiv.appendChild(taskPriority);
-        taskDiv.appendChild(label);
-        taskDiv.appendChild(taskCheckBox);
+        taskDiv.appendChild(taskCompleteLabel);
         taskDiv.appendChild(deleteTask);
 
         deleteTask.addEventListener('click', () => {
@@ -342,7 +377,7 @@ function loadList() {
             deleteTodo(item);
         })
 
-        taskCheckBox.addEventListener('click', (event) => {
+        taskComplete.addEventListener('click', (event) => {
             markComplete(event, item);
         })
 
