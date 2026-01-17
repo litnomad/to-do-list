@@ -4,7 +4,7 @@ To do list app that allows users to create and keep track of projects, prioritie
 ## Objective
 The objective of this project is to create a to do list app that allows the user to add projects and then to do items to each project. The to do items are modifiable and includes checkboxes. All projects with their to do list will be displayed on the page. 
 
-This project serves to apply what I have learned about the single responsibility principle, local storage, and ES6 modules, which are bundled into a single file with Webpack.
+This project applies what I have learned about the single responsibility principle, local storage, and ES6 modules, which are bundled into a single file with Webpack.
 
 ## Features
 - Basic to do list
