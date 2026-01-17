@@ -13,4 +13,4 @@ Javascript ES6 modules are exported into HTML and are bundled with Webpack.
 - Mark checkboxes as complete
 - Local storage saves projects in the browser
 
-See [example](https://htmlpreview.github.io/?https://github.com/litnomad/to-do-list/blob/93bcdc6830c94afc1c3c485ce88f00138884a709/index.html).
+See [example](https://htmlpreview.github.io/?https://github.com/litnomad/to-do-list/blob/27ec6f3082bc7128ed3a0132d3ec37cec0818918/index.html).
