@@ -1,16 +1,16 @@
-import { createToDoItem, createProject, changeDeadline, changePriority, markComplete, deleteTodo, deleteProject, retrieveProjectData, retrieveListData, projects, list } from './applicationlogic.js'
+import { createToDoItem, createProject, changeDeadline, changePriority, markComplete, deleteTodo, deleteProject } from './applicationlogic.js'
+import { retrieveProjectData, retrieveListData, projects, list } from './applicationlogic.js'
 
 const main = document.querySelector('#main');
-const sidebar = document.querySelector('#sidebarLinks');
 const dialog = document.querySelector('dialog');
-const showButton = document.querySelector('#openDialog');
+const addButton = document.querySelector('#openDialog');
 const closeButton = document.querySelector('dialog button');
 const confirm = document.querySelector('#confirmBtn')
 const inputProject = document.querySelector('input#title');
 
-// event listeners for "add link"
+// clicking "add project" element on the page opens a dialog
 
-showButton.addEventListener('click', () => {
+addButton.addEventListener('click', () => {
     dialog.showModal();
 });
 
@@ -22,17 +22,16 @@ confirm.addEventListener('click', (event) => {
     event.preventDefault();
     dialog.close();
 
+    // project data is received and stored in projects = []
+
     const projectId = crypto.randomUUID();
     const projectTitle = inputProject.value;
-    // sends project data to application logic
     createProject(projectId, projectTitle);
-    // displays project on page
-    createProjectElements(projectId, projectTitle);
+
+    displayProject(projectId, projectTitle);
 })
 
-// how project will be displayed on page
-
-const createProjectElements = (projectId, projectTitle) => {
+const displayProject = (projectId, projectTitle) => {
 
     const projectDiv = document.createElement('div');
     const headerContainer = document.createElement('div');
@@ -60,17 +59,30 @@ const createProjectElements = (projectId, projectTitle) => {
 
     toDoButton.addEventListener('click', (event) => {
         event.preventDefault();
-        // creates dialog 
+
+        // creates dialog for Todo form
+
         createToDoFormDialog(projectId);
-        // opens dialog 
+
+        // opens dialog for Todo form 
+
         const dialogSelector = document.querySelector(`dialog[id="${projectId}"]`);
         if (dialogSelector) {
-            // fixes fail to show modal because of open dialog bug
-            if (dialogSelector.hasAttribute('open')) { dialogSelector.close() }
+
+            // if dialog is open, close (due to "fail to show modal because of open dialog" bug)
+
+            if (dialogSelector.hasAttribute('open')) {
+                dialogSelector.close()
+            }
+
             dialogSelector.showModal();
+
         };
-        // renders to do form 
+
+        // displays Todo form
+
         toDoForm(projectTitle, projectId);
+
     });
 
     deleteProject.addEventListener('click', () => {
@@ -79,37 +91,40 @@ const createProjectElements = (projectId, projectTitle) => {
 
 }
 
-// creates dialog element for to do form
+// dialog element for Todo form of project
 
 const dial = document.createElement('dialog');
 
 const createToDoFormDialog = (projectId) => {
 
     const project = document.getElementById(`${projectId}`);
-
     dial.setAttribute('id', `${projectId}`);
-
     project.appendChild(dial);
 
     return dial;
 }
 
+// if escape key, remove dialog element
+
 dial.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-        dial.innerHTML = '';
         dial.remove();
     }
 });
 
-// creates to do form elements 
+// displays Todo form 
 
 const toDoForm = (projectTitle, projectId) => {
 
+    // clears form from dialog
+
+    dial.innerHTML = '';
+
     const form = document.createElement('form');
-    const title = document.createElement('label');
-    const description = document.createElement('label');
-    const deadline = document.createElement('label');
-    const priority = document.createElement('label');
+    const titleLabel = document.createElement('label');
+    const descriptionLabel = document.createElement('label');
+    const deadlineLabel = document.createElement('label');
+    const priorityLabel = document.createElement('label');
     const inputTitle = document.createElement('input');
     const inputDescription = document.createElement('textarea');
     const inputDeadline = document.createElement('input');
@@ -133,15 +148,15 @@ const toDoForm = (projectTitle, projectId) => {
     inputDeadline.setAttribute('name', 'deadline');
     inputPriority.setAttribute('name', 'priority');
 
-    title.setAttribute('for', 'title');
-    description.setAttribute('for', 'description');
-    deadline.setAttribute('for', 'deadline');
-    priority.setAttribute('for', 'priority');
+    titleLabel.setAttribute('for', 'title');
+    descriptionLabel.setAttribute('for', 'description');
+    deadlineLabel.setAttribute('for', 'deadline');
+    priorityLabel.setAttribute('for', 'priority');
 
-    title.textContent = 'title:';
-    description.textContent = 'description:';
-    deadline.textContent = 'deadline:';
-    priority.textContent = 'priority:';
+    titleLabel.textContent = 'title:';
+    descriptionLabel.textContent = 'description:';
+    deadlineLabel.textContent = 'deadline:';
+    priorityLabel.textContent = 'priority:';
     submit.textContent = 'submit';
     cancel.textContent = 'cancel';
 
@@ -151,40 +166,35 @@ const toDoForm = (projectTitle, projectId) => {
     inputPriority.setAttribute('id', 'priority');
 
     dial.appendChild(form);
-    form.appendChild(title);
+    form.appendChild(titleLabel);
     form.appendChild(inputTitle);
-    form.appendChild(description);
+    form.appendChild(descriptionLabel);
     form.appendChild(inputDescription);
-    form.appendChild(deadline);
+    form.appendChild(deadlineLabel);
     form.appendChild(inputDeadline);
-    form.appendChild(priority);
+    form.appendChild(priorityLabel);
     form.appendChild(inputPriority);
     form.appendChild(submit);
     form.appendChild(cancel);
 
     submit.addEventListener('click', (event) => {
         event.preventDefault();
-        // sends form data of to do item to application logic
+        dial.close();
+
+        // Todo data is received and stored in list = [] 
         let item = createToDoItem(projectTitle, projectId, inputTitle.value, inputDescription.value, inputDeadline.value, inputPriority.value, false).getItem();
-        // resets dial node for next element create
-        dial.innerHTML = '';
-        dial.remove();
-        // creates elements for to do item
-        displayList(item);
+
+        displayToDoItem(item);
+
     });
 
     cancel.addEventListener('click', () => {
         dial.close();
-        // resets dial node for next element create
-        dial.innerHTML = '';
-        dial.remove();
     })
 
 }
 
-// how tasks will be displayed on page 
-
-function displayList(item) {
+function displayToDoItem(item) {
 
     const project = document.getElementById(`${item.id}`);
 
@@ -257,7 +267,7 @@ function displayList(item) {
 
 }
 
-// renders page from local storage
+// displays projects and lists from local storage
 
 function loadProjects() {
 
@@ -294,16 +304,20 @@ function loadProjects() {
 
         toDoButton.addEventListener('click', (event) => {
             event.preventDefault();
-            // creates dialog 
+
             createToDoFormDialog(projectId);
-            // opens dialog 
+
             const dialogSelector = document.querySelector(`dialog[id="${projectId}"]`);
             if (dialogSelector) {
-                // fixes fail to show modal because of open dialog bug
-                if (dialogSelector.hasAttribute('open')) { dialogSelector.close() }
+
+                if (dialogSelector.hasAttribute('open')) {
+                    dialogSelector.close()
+                }
+
                 dialogSelector.showModal();
+
             };
-            // renders to do form 
+
             toDoForm(projectTitle, projectId);
         });
 

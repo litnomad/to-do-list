@@ -1,4 +1,3 @@
-// array for to do items
 let list = [];
 let projects = [];
 
